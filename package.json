@@ -6,12 +6,16 @@
   "scripts": {
     "start": "npm run watch",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "browser-sync start -c bs-config.js"
+    "watch": "browser-sync start -c bs-config.js",
+    "deploy": "gh-pages -d public"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "browser-sync": "^2.17.2"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "gh-pages": "^0.11.0"
+  }
 }
