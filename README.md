@@ -1,16 +1,4 @@
-# js-study
-a handy boilerplate to study javascript.
+# mouse-stalker
+Yet anothe mouse stalker example
 
-## Install
-
-```bash
-git clone https://github.com/meganetaaan/js-study.git
-cd js-study
-npm install
-```
-
-## Start Server
-```barsh
-npm start
-#Access to localhost:3000
-```
+[Try it!!](https://meganetaaan.github.io/mouse-stalker)
