@@ -40,6 +40,7 @@ window.sample = window.sample || {}
         transform += ' scaleX(-1)'
       }
       elem.style.setProperty('transform', transform)
+      elem.style.zIndex = this.y
     }
     constructor ({x, y} = {x: 0, y: 0}) {
       x = x != null ? x : 0
