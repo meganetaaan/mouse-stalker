@@ -5,8 +5,41 @@ html,body {
   margin: 0;
   padding: 0;
 }
+body {
+  background-color: #FAFAFA;
+}
 
 .tori {
   transition-property: top left;
   transition-timing-function: linear;
 }
+
+.logo-container {
+  position: absolute;
+  color: #232323;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.logo {
+  font-size: 6em;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", MyYuGothicM, Meiryo, sans-serif;
+}
+
+@font-face {
+  font-family: "MyYuGothicM";
+  font-weight: normal;
+  src: local("YuGothic-Medium"),
+  local("Yu Gothic Medium"),
+  local("YuGothic-Regular");
+}
+@font-face {
+  font-family "MyYuGothicM";
+  font-weight bold;
+  src local("YuGothic-Bold"),
+  local("Yu Gothic");
+}
+
