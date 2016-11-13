@@ -8,12 +8,6 @@ html,body {
 body {
   background-color: #FAFAFA;
 }
-
-.tori {
-  transition-property: top left;
-  transition-timing-function: linear;
-}
-
 .logo-container {
   position: absolute;
   color: #232323;
@@ -27,6 +21,9 @@ body {
 .logo {
   font-size: 6em;
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", MyYuGothicM, Meiryo, sans-serif;
+}
+.logo>.highlight {
+  color: #2196F3
 }
 
 @font-face {
