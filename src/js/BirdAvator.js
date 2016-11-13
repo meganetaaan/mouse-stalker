@@ -1,5 +1,34 @@
 import Avator from './Avator'
 // XXX: 'BirdAvator' isn't an Avator anymore so better to use composition
+
+class ColorChanger {
+  constructor () {
+    this._canvas = document.createElement('canvas')
+  }
+}
+
+function changeColor (img, srcColor, destColor) {
+  const canvas = document.getElementById('canvas')
+  const ctx = canvas.getContext('2d')
+  const image = document.getElementById('testImage')
+  ctx.drawImage(image, 0, 0)
+  const imgd = ctx.getImageData(0, 0, 128, 128)
+  const pix = imgd.data
+
+  // Loops through all of the pixels and modifies the components.
+  for (let i = 0, n = pix.length; i < n; i += 4) {
+    pix[i] = destColor[0]   // Red component
+    pix[i + 1] = destColor[1] // Blue component
+    pix[i + 2] = destColor[2] // Green component
+    // pix[i+3] is the transparency.
+  }
+
+  ctx.putImageData(imgd, 0, 0)
+
+  const savedImageData = document.getElementById('imageData')
+  savedImageData.src = canvas.toDataURL('image/png')
+}
+
 class BirdAvator extends Avator {
   static randomBetween (from, to) {
     return from + Math.floor(Math.random() * (to - from))

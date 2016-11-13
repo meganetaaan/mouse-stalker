@@ -153,13 +153,42 @@ var _Avator3 = _interopRequireDefault(_Avator2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 // XXX: 'BirdAvator' isn't an Avator anymore so better to use composition
+
+var ColorChanger = function ColorChanger() {
+  _classCallCheck(this, ColorChanger);
+
+  this._canvas = document.createElement('canvas');
+};
+
+function changeColor(img, srcColor, destColor) {
+  var canvas = document.getElementById('canvas');
+  var ctx = canvas.getContext('2d');
+  var image = document.getElementById('testImage');
+  ctx.drawImage(image, 0, 0);
+  var imgd = ctx.getImageData(0, 0, 128, 128);
+  var pix = imgd.data;
+
+  // Loops through all of the pixels and modifies the components.
+  for (var i = 0, n = pix.length; i < n; i += 4) {
+    pix[i] = destColor[0]; // Red component
+    pix[i + 1] = destColor[1]; // Blue component
+    pix[i + 2] = destColor[2]; // Green component
+    // pix[i+3] is the transparency.
+  }
+
+  ctx.putImageData(imgd, 0, 0);
+
+  var savedImageData = document.getElementById('imageData');
+  savedImageData.src = canvas.toDataURL('image/png');
+}
+
 var BirdAvator = function (_Avator) {
   _inherits(BirdAvator, _Avator);
 
