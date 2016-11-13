@@ -1,49 +1,46 @@
+'use strict'
 import Avator from './Avator'
+import ColorChanger from './ColorChanger'
 // XXX: 'BirdAvator' isn't an Avator anymore so better to use composition
 
-class ColorChanger {
-  constructor () {
-    this._canvas = document.createElement('canvas')
-  }
-}
-
-function changeColor (img, srcColor, destColor) {
-  const canvas = document.getElementById('canvas')
-  const ctx = canvas.getContext('2d')
-  const image = document.getElementById('testImage')
-  ctx.drawImage(image, 0, 0)
-  const imgd = ctx.getImageData(0, 0, 128, 128)
-  const pix = imgd.data
-
-  // Loops through all of the pixels and modifies the components.
-  for (let i = 0, n = pix.length; i < n; i += 4) {
-    pix[i] = destColor[0]   // Red component
-    pix[i + 1] = destColor[1] // Blue component
-    pix[i + 2] = destColor[2] // Green component
-    // pix[i+3] is the transparency.
-  }
-
-  ctx.putImageData(imgd, 0, 0)
-
-  const savedImageData = document.getElementById('imageData')
-  savedImageData.src = canvas.toDataURL('image/png')
-}
-
+const _img = new Image()
+_img.src = 'img/tori.png'
 class BirdAvator extends Avator {
   static randomBetween (from, to) {
     return from + Math.floor(Math.random() * (to - from))
   }
-  static init () {
+
+  static getImage (destColor) {
+    if (BirdAvator._colorChanger == null) {
+      BirdAvator._colorChanger = new ColorChanger()
+    }
+    const targetColor = [0, 255, 255]
+    if(destColor == null) {
+      destColor = [
+        BirdAvator.randomBetween(0, 255),
+        BirdAvator.randomBetween(0, 255),
+        BirdAvator.randomBetween(0, 255)
+      ]
+    }
+    return BirdAvator._colorChanger.getModifiedImage(_img, targetColor, destColor)
+  }
+
+  static setChangeColorHandler (f) {
+    this._changeColorHandler = f
+  }
+
+  static init (color) {
     const elem = document.createElement('div')
     elem.classList.add('bird', 'avator')
     elem.style.position = 'absolute'
     const img = document.createElement('img')
     img.setAttribute('width', '20px')
     img.setAttribute('height', '20px')
-    img.setAttribute('src', 'img/tori.png')
+    img.setAttribute('src', BirdAvator.getImage(color))
     elem.appendChild(img)
     return elem
   }
+
   static render (elem) {
     const posHist = this.positionHistory
     let range = 0
@@ -67,14 +64,23 @@ class BirdAvator extends Avator {
       transform += ' scaleX(-1)'
     }
     elem.style.setProperty('transform', transform)
-    elem.style.zIndex = this.y + 25
+    elem.style.zIndex = this.y + 35
   }
-  constructor ({x, y} = {x: 0, y: 0}) {
+
+  constructor ({x, y, callback} = {x: 0, y: 0}) {
     x = x != null ? x : 0
     y = y != null ? y : 0
-    super({x, y, init: BirdAvator.init, render: BirdAvator.render})
+    const destColor = [
+      BirdAvator.randomBetween(0, 255),
+      BirdAvator.randomBetween(0, 255),
+      BirdAvator.randomBetween(0, 255)
+    ]
+    super({x, y, init: BirdAvator.init.bind(null, destColor), render: BirdAvator.render})
     this._tick = 30
     this._count = BirdAvator.randomBetween(0, this._tick)
+    if (BirdAvator._changeColorHandler) {
+      BirdAvator._changeColorHandler(destColor)
+    }
   }
 }
 export default BirdAvator
