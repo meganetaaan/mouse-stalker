@@ -18,9 +18,18 @@ container.addEventListener('mousemove', (context) => {
   }
 })
 
+BirdAvator.setChangeColorHandler((color) => {
+  const highlight = document.getElementsByClassName('highlight')[0]
+  highlight.style.color = `rgb(${color[0]}, ${color[1]}, ${color[2]})`
+})
+
 // logo z-index
-for (const className of ['logo', 'description']) {
-  const elem = document.getElementsByClassName(className)[0]
-  console.log(elem.getBoundingClientRect().bottom)
-  elem.style.zIndex = Math.round(Number(elem.getBoundingClientRect().bottom))
+function resetZIndex () {
+  for (const className of ['logo', 'description']) {
+    const elem = document.getElementsByClassName(className)[0]
+    elem.style.zIndex = Math.round(Number(elem.getBoundingClientRect().bottom))
+  }
 }
+
+window.addEventListener('resize', resetZIndex)
+resetZIndex()

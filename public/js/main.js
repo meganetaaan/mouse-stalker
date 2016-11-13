@@ -151,6 +151,10 @@ var _Avator2 = require('./Avator');
 
 var _Avator3 = _interopRequireDefault(_Avator2);
 
+var _ColorChanger = require('./ColorChanger');
+
+var _ColorChanger2 = _interopRequireDefault(_ColorChanger);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -160,6 +164,10 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 // XXX: 'BirdAvator' isn't an Avator anymore so better to use composition
+
+var _img = new Image();
+_img.src = 'img/tori.png';
+
 var BirdAvator = function (_Avator) {
   _inherits(BirdAvator, _Avator);
 
@@ -169,15 +177,32 @@ var BirdAvator = function (_Avator) {
       return from + Math.floor(Math.random() * (to - from));
     }
   }, {
+    key: 'getImage',
+    value: function getImage(destColor) {
+      if (BirdAvator._colorChanger == null) {
+        BirdAvator._colorChanger = new _ColorChanger2.default();
+      }
+      var targetColor = [0, 255, 255];
+      if (destColor == null) {
+        destColor = [BirdAvator.randomBetween(0, 255), BirdAvator.randomBetween(0, 255), BirdAvator.randomBetween(0, 255)];
+      }
+      return BirdAvator._colorChanger.getModifiedImage(_img, targetColor, destColor);
+    }
+  }, {
+    key: 'setChangeColorHandler',
+    value: function setChangeColorHandler(f) {
+      this._changeColorHandler = f;
+    }
+  }, {
     key: 'init',
-    value: function init() {
+    value: function init(color) {
       var elem = document.createElement('div');
       elem.classList.add('bird', 'avator');
       elem.style.position = 'absolute';
       var img = document.createElement('img');
       img.setAttribute('width', '20px');
       img.setAttribute('height', '20px');
-      img.setAttribute('src', 'img/tori.png');
+      img.setAttribute('src', BirdAvator.getImage(color));
       elem.appendChild(img);
       return elem;
     }
@@ -206,24 +231,29 @@ var BirdAvator = function (_Avator) {
         transform += ' scaleX(-1)';
       }
       elem.style.setProperty('transform', transform);
-      elem.style.zIndex = this.y + 25;
+      elem.style.zIndex = this.y + 35;
     }
   }]);
 
   function BirdAvator() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { x: 0, y: 0 },
         x = _ref.x,
-        y = _ref.y;
+        y = _ref.y,
+        callback = _ref.callback;
 
     _classCallCheck(this, BirdAvator);
 
     x = x != null ? x : 0;
     y = y != null ? y : 0;
+    var destColor = [BirdAvator.randomBetween(0, 255), BirdAvator.randomBetween(0, 255), BirdAvator.randomBetween(0, 255)];
 
-    var _this = _possibleConstructorReturn(this, (BirdAvator.__proto__ || Object.getPrototypeOf(BirdAvator)).call(this, { x: x, y: y, init: BirdAvator.init, render: BirdAvator.render }));
+    var _this = _possibleConstructorReturn(this, (BirdAvator.__proto__ || Object.getPrototypeOf(BirdAvator)).call(this, { x: x, y: y, init: BirdAvator.init.bind(null, destColor), render: BirdAvator.render }));
 
     _this._tick = 30;
     _this._count = BirdAvator.randomBetween(0, _this._tick);
+    if (BirdAvator._changeColorHandler) {
+      BirdAvator._changeColorHandler(destColor);
+    }
     return _this;
   }
 
@@ -232,7 +262,60 @@ var BirdAvator = function (_Avator) {
 
 exports.default = BirdAvator;
 
-},{"./Avator":1}],3:[function(require,module,exports){
+},{"./Avator":1,"./ColorChanger":3}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ColorChanger = function () {
+  function ColorChanger() {
+    _classCallCheck(this, ColorChanger);
+
+    this._canvas = document.createElement('canvas');
+  }
+
+  _createClass(ColorChanger, [{
+    key: 'getModifiedImage',
+    value: function getModifiedImage(img, targetColor, destColor) {
+      var canvas = this._canvas;
+      canvas.width = 20;
+      canvas.height = 20;
+      var context = canvas.getContext('2d');
+      context.drawImage(img, 0, 0);
+      var imgd = context.getImageData(0, 0, img.width, img.height);
+      var pix = imgd.data;
+
+      // Loops through all of the pixels and modifies the components.
+      for (var i = 0, n = pix.length; i < n; i += 4) {
+        if (ColorChanger.isSameColor(pix[i], pix[i + 1], pix[i + 2], targetColor)) {
+          pix[i] = destColor[0]; // Red component
+          pix[i + 1] = destColor[1]; // Blue component
+          pix[i + 2] = destColor[2]; // Green component
+          // pix[i+3] is the transparency.
+        }
+      }
+      context.putImageData(imgd, 0, 0);
+      return canvas.toDataURL('image/png');
+    }
+  }], [{
+    key: 'isSameColor',
+    value: function isSameColor(r, g, b, target) {
+      return r === target[0] && g === target[1] && b === target[2];
+    }
+  }]);
+
+  return ColorChanger;
+}();
+
+exports.default = ColorChanger;
+
+},{}],4:[function(require,module,exports){
 'use strict';
 
 var _BirdAvator = require('./BirdAvator');
@@ -259,14 +342,24 @@ container.addEventListener('mousemove', function (context) {
   }
 });
 
+_BirdAvator2.default.setChangeColorHandler(function (color) {
+  var highlight = document.getElementsByClassName('highlight')[0];
+  highlight.style.color = 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')';
+});
+
 // logo z-index
-var _arr = ['logo', 'description'];
-for (var _i = 0; _i < _arr.length; _i++) {
-  var className = _arr[_i];
-  var elem = document.getElementsByClassName(className)[0];
-  console.log(elem.getBoundingClientRect().bottom);
-  elem.style.zIndex = Math.round(Number(elem.getBoundingClientRect().bottom));
+function resetZIndex() {
+  var _arr = ['logo', 'description'];
+
+  for (var _i = 0; _i < _arr.length; _i++) {
+    var className = _arr[_i];
+    var elem = document.getElementsByClassName(className)[0];
+    elem.style.zIndex = Math.round(Number(elem.getBoundingClientRect().bottom));
+  }
 }
 
-},{"./BirdAvator":2}]},{},[3])
+window.addEventListener('resize', resetZIndex);
+resetZIndex();
+
+},{"./BirdAvator":2}]},{},[4])
 //# sourceMappingURL=main.js.map
