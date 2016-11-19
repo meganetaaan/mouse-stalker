@@ -326,20 +326,55 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 var container = document.getElementsByTagName('body')[0];
 var avators = [];
+var STEP_SIZE = 1;
 var posHist = [];
+var accs = [];
 container.addEventListener('click', function (context) {
   var avator = new _BirdAvator2.default({ x: context.pageX, y: context.pageY });
   avator.bind(container);
   avators.splice(0, 0, avator);
+  var acc = {
+    dA: _BirdAvator2.default.randomBetween(10, 30) / 100.0,
+    maxVx: 3, // BirdAvator.randomBetween(1, 5),
+    maxVy: 3, // BirdAvator.randomBetween(1, 5),
+    vx: 0,
+    vy: 0,
+    ax: 0,
+    ay: 0
+  };
+  accs.splice(0, 0, acc);
 });
+function loop() {
+  // const pos = posHist[posHist.length - 1]
+  for (var i = 0, len = avators.length; i < len; i++) {
+    var pos = i === 0 ? posHist[posHist.length - 1] : avators[i - 1];
+    var avator = avators[i];
+    var acc = accs[i];
+    var dx = pos.x - avator.x;
+    var dy = pos.y - avator.y;
+    /*
+    dx = dx ? dx * STEP_SIZE / Math.abs(dx) : 0
+    dy = dy ? dy * STEP_SIZE / Math.abs(dy) : 0
+    */
+    acc.ax = dx !== 0 ? dx > 0 ? acc.dA : -acc.dA : 0;
+    acc.vx = Math.abs(dx) < 5 && Math.abs(acc.vx) < 3 ? 0 : Math.max(-acc.maxVx, Math.min(acc.maxVx, acc.vx + acc.ax));
+    acc.ay = dy !== 0 ? dy > 0 ? acc.dA : -acc.dA : 0;
+    acc.vy = Math.abs(dy) < 5 && Math.abs(acc.vy) < 3 ? 0 : Math.max(-acc.maxVy, Math.min(acc.maxVy, acc.vy + acc.ay));
+    // console.log(JSON.stringify(acc))
+    avator.moveBy(acc.vx, acc.vy);
+  }
+}
+window.setInterval(loop, 15);
 container.addEventListener('mousemove', function (context) {
   posHist.push({ x: context.pageX, y: context.pageY });
   posHist = posHist.slice(-10 * avators.length);
-  for (var i = 0, len = avators.length; i < len; i++) {
-    var idx = Math.max(0, posHist.length - i * 10 - 1);
-    var pos = posHist[idx];
-    avators[i].moveTo(pos.x, pos.y);
+  /*
+  for (let i = 0, len = avators.length; i < len; i++) {
+    const idx = Math.max(0, posHist.length - i * 10 - 1)
+    const pos = posHist[idx]
+    avators[i].moveTo(pos.x, pos.y)
   }
+  */
 });
 
 _BirdAvator2.default.setChangeColorHandler(function (color) {
