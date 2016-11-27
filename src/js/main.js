@@ -1,4 +1,5 @@
 'use strict'
+import 'babel-polyfill'
 import BirdAvator from './BirdAvator'
 const container = document.getElementsByTagName('body')[0]
 const avators = []
