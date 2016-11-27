@@ -7320,7 +7320,7 @@ function updatePosHist(x, y) {
 }
 
 // adding event listeners
-var container = document.getElementsByTagName('body')[0];
+var container = document.getElementsByClassName('mouse-stalker-container')[0];
 
 container.addEventListener('mousemove', function (event) {
   var x = event.pageX;
