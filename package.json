@@ -4,7 +4,7 @@
   "description": "yet another mouse stalker example",
   "main": "index.js",
   "scripts": {
-    "watch": "watchify -t [ babelify --presets [ es2015 ]  ] src/js/main.js -o 'exorcist ./public/js/main.js.map > ./public/js/main.js' -d",
+    "watch": "watchify -t [ babelify --presets [ es2015 ]  ] src/js/main.js -o \"exorcist ./public/js/main.js.map > ./public/js/main.js\" -d",
     "server": "browser-sync start -c bs-config.js",
     "start": "npm run watch & npm run server",
     "deploy": "gh-pages -d public"
