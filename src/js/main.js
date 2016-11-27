@@ -54,7 +54,7 @@ function updatePosHist (x, y) {
 }
 
 // adding event listeners
-const container = document.getElementsByTagName('body')[0]
+const container = document.getElementsByClassName('mouse-stalker-container')[0]
 
 container.addEventListener('mousemove', (event) => {
   const x = event.pageX
