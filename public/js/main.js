@@ -7268,15 +7268,64 @@ var _BirdAvator2 = _interopRequireDefault(_BirdAvator);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var container = document.getElementsByTagName('body')[0];
 var avators = [];
 var STEP_SIZE = 1;
-var posHist = [];
 var accs = [];
+var posHist = [];
+var moveStrategyStr = 'strict';
+var moveStrategy = {
+  strict: moveStrict,
+  moderate: moveModerate
+};
+
+function moveStrict(i, avator) {
+  var idx = Math.max(0, posHist.length - i * 10 - 1);
+  var pos = posHist[idx];
+  avator.moveTo(pos.x, pos.y);
+}
+
+function moveModerate(i, avator) {
+  var pos = i === 0 ? posHist[posHist.length - 1] : avators[i - 1];
+  var acc = accs[i];
+  var dx = pos.x - avator.x;
+  var dy = pos.y - avator.y;
+  acc.ax = dx !== 0 ? dx > 0 ? acc.dA : -acc.dA : 0;
+  acc.vx = Math.abs(dx) < 5 && Math.abs(acc.vx) < 3 ? 0 : Math.max(-acc.maxVx, Math.min(acc.maxVx, acc.vx + acc.ax));
+  acc.ay = dy !== 0 ? dy > 0 ? acc.dA : -acc.dA : 0;
+  acc.vy = Math.abs(dy) < 5 && Math.abs(acc.vy) < 3 ? 0 : Math.max(-acc.maxVy, Math.min(acc.maxVy, acc.vy + acc.ay));
+  avator.moveBy(acc.vx, acc.vy);
+}
+
+function loop() {
+  for (var i = 0, len = avators.length; i < len; i++) {
+    var avator = avators[i];
+    var func = moveStrategy[moveStrategyStr];
+    func(i, avator);
+  }
+}
+
+function resetZIndex() {
+  var _arr = ['logo', 'description'];
+
+  for (var _i = 0; _i < _arr.length; _i++) {
+    var className = _arr[_i];
+    var elem = document.getElementsByClassName(className)[0];
+    elem.style.zIndex = Math.round(Number(elem.getBoundingClientRect().bottom));
+  }
+}
+
+// adding event listeners
+var container = document.getElementsByTagName('body')[0];
+container.addEventListener('mousemove', function (context) {
+  posHist.push({ x: context.pageX, y: context.pageY });
+  posHist = posHist.slice(-10 * avators.length);
+});
+
 container.addEventListener('contextmenu', function (context) {
   context.preventDefault();
   moveStrategyStr = moveStrategyStr === 'strict' ? 'moderate' : 'strict';
 });
+
 container.addEventListener('click', function (context) {
   var avator = new _BirdAvator2.default({ x: context.pageX, y: context.pageY });
   avator.bind(container);
@@ -7292,59 +7341,17 @@ container.addEventListener('click', function (context) {
   };
   accs.splice(0, 0, acc);
 });
-var moveStrategyStr = 'strict';
-var moveStrategy = {
-  strict: function strict(i, avator) {
-    var idx = Math.max(0, posHist.length - i * 10 - 1);
-    var pos = posHist[idx];
-    avator.moveTo(pos.x, pos.y);
-  },
-  moderate: function moderate(i, avator) {
-    var pos = i === 0 ? posHist[posHist.length - 1] : avators[i - 1];
-    var acc = accs[i];
-    var dx = pos.x - avator.x;
-    var dy = pos.y - avator.y;
-    acc.ax = dx !== 0 ? dx > 0 ? acc.dA : -acc.dA : 0;
-    acc.vx = Math.abs(dx) < 5 && Math.abs(acc.vx) < 3 ? 0 : Math.max(-acc.maxVx, Math.min(acc.maxVx, acc.vx + acc.ax));
-    acc.ay = dy !== 0 ? dy > 0 ? acc.dA : -acc.dA : 0;
-    acc.vy = Math.abs(dy) < 5 && Math.abs(acc.vy) < 3 ? 0 : Math.max(-acc.maxVy, Math.min(acc.maxVy, acc.vy + acc.ay));
-    avator.moveBy(acc.vx, acc.vy);
-  }
-};
-
-function loop() {
-  // const pos = posHist[posHist.length - 1]
-  for (var i = 0, len = avators.length; i < len; i++) {
-    var avator = avators[i];
-    var func = moveStrategy[moveStrategyStr];
-    func(i, avator);
-  }
-}
-
-window.setInterval(loop, 15);
-container.addEventListener('mousemove', function (context) {
-  posHist.push({ x: context.pageX, y: context.pageY });
-  posHist = posHist.slice(-10 * avators.length);
-});
 
 _BirdAvator2.default.setChangeColorHandler(function (color) {
   var highlight = document.getElementsByClassName('highlight')[0];
   highlight.style.color = 'rgb(' + color[0] + ', ' + color[1] + ', ' + color[2] + ')';
 });
 
-// logo z-index
-function resetZIndex() {
-  var _arr = ['logo', 'description'];
-
-  for (var _i = 0; _i < _arr.length; _i++) {
-    var className = _arr[_i];
-    var elem = document.getElementsByClassName(className)[0];
-    elem.style.zIndex = Math.round(Number(elem.getBoundingClientRect().bottom));
-  }
-}
-
 window.addEventListener('resize', resetZIndex);
-resetZIndex();
+document.addEventListener('DOMContentLoaded', function () {
+  window.setInterval(loop, 15);
+  resetZIndex();
+});
 
 },{"./BirdAvator":299,"babel-polyfill":1}]},{},[301])
 //# sourceMappingURL=main.js.map
