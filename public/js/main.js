@@ -7314,20 +7314,34 @@ function resetZIndex() {
   }
 }
 
+function updatePosHist(x, y) {
+  posHist.push({ x: x, y: y });
+  posHist = posHist.slice(-10 * avators.length);
+}
+
 // adding event listeners
 var container = document.getElementsByTagName('body')[0];
-container.addEventListener('mousemove', function (context) {
-  posHist.push({ x: context.pageX, y: context.pageY });
-  posHist = posHist.slice(-10 * avators.length);
+
+container.addEventListener('mousemove', function (event) {
+  var x = event.pageX;
+  var y = event.pageY;
+  updatePosHist(x, y);
 });
 
-container.addEventListener('contextmenu', function (context) {
-  context.preventDefault();
+container.addEventListener('touchmove', function (event) {
+  event.preventDefault();
+  var x = event.changedTouches[0].pageX;
+  var y = event.changedTouches[0].pageY;
+  updatePosHist(x, y);
+});
+
+container.addEventListener('contextmenu', function (event) {
+  event.preventDefault();
   moveStrategyStr = moveStrategyStr === 'strict' ? 'moderate' : 'strict';
 });
 
-container.addEventListener('click', function (context) {
-  var avator = new _BirdAvator2.default({ x: context.pageX, y: context.pageY });
+container.addEventListener('click', function (event) {
+  var avator = new _BirdAvator2.default({ x: event.pageX, y: event.pageY });
   avator.bind(container);
   avators.splice(0, 0, avator);
   var acc = {
