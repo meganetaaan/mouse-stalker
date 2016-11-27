@@ -48,20 +48,34 @@ function resetZIndex () {
   }
 }
 
+function updatePosHist (x, y) {
+  posHist.push({x, y})
+  posHist = posHist.slice(-10 * avators.length)
+}
+
 // adding event listeners
 const container = document.getElementsByTagName('body')[0]
-container.addEventListener('mousemove', (context) => {
-  posHist.push({x: context.pageX, y: context.pageY})
-  posHist = posHist.slice(-10 * avators.length)
+
+container.addEventListener('mousemove', (event) => {
+  const x = event.pageX
+  const y = event.pageY
+  updatePosHist(x, y)
 })
 
-container.addEventListener('contextmenu', (context) => {
-  context.preventDefault()
+container.addEventListener('touchmove', (event) => {
+  event.preventDefault()
+  const x = event.changedTouches[0].pageX;
+  const y = event.changedTouches[0].pageY;
+  updatePosHist(x, y)
+})
+
+container.addEventListener('contextmenu', (event) => {
+  event.preventDefault()
   moveStrategyStr = moveStrategyStr === 'strict' ? 'moderate' : 'strict'
 })
 
-container.addEventListener('click', (context) => {
-  const avator = new BirdAvator({x: context.pageX, y: context.pageY})
+container.addEventListener('click', (event) => {
+  const avator = new BirdAvator({x: event.pageX, y: event.pageY})
   avator.bind(container)
   avators.splice(0, 0, avator)
   const acc = {
